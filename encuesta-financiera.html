@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encuesta de Satisfacción</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=DM+Sans:wght@400;500;700&display=swap');
+        
+        :root {
+            --primary: #FF6B35;
+            --primary-dark: #E85A28;
+            --secondary: #004E89;
+            --accent: #F7B801;
+            --bg-main: #FFF8F3;
+            --bg-card: #FFFFFF;
+            --text-dark: #1A1A1A;
+            --text-medium: #5A5A5A;
+            --text-light: #8A8A8A;
+            --border: #E8E8E8;
+            --success: #06A77D;
+            --shadow: rgba(255, 107, 53, 0.08);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(135deg, var(--bg-main) 0%, #FFE8DC 100%);
+            color: var(--text-dark);
+            min-height: 100vh;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            background: var(--bg-card);
+            border-radius: 24px 24px 0 0;
+            box-shadow: 0 4px 20px var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+        }
+        
+        .header h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            color: var(--text-medium);
+            font-size: 15px;
+            line-height: 1.5;
+        }
+        
+        .progress-container {
+            background: var(--bg-card);
+            padding: 20px;
+            box-shadow: 0 2px 10px var(--shadow);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #F0F0F0;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+            border-radius: 20px;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px rgba(255, 107, 53, 0.3);
+        }
+        
+        .progress-text {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-medium);
+            letter-spacing: 0.5px;
+        }
+        
+        .question-card {
+            background: var(--bg-card);
+            border-radius: 0 0 24px 24px;
+            padding: 30px 20px 40px;
+            box-shadow: 0 8px 30px var(--shadow);
+            flex-grow: 1;
+            animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .question-number {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+        }
+        
+        .question-text {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-dark);
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .option {
+            background: #FAFAFA;
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 18px 20px;
+            font-size: 16px;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(255, 107, 53, 0.1) 0%, rgba(247, 184, 1, 0.1) 100%);
+            transition: width 0.3s ease;
+            z-index: 0;
+        }
+        
+        .option-content {
+            position: relative;
+            z-index: 1;
+            flex: 1;
+        }
+        
+        .option:active {
+            transform: scale(0.98);
+        }
+        
+        .option:hover {
+            border-color: var(--primary);
+            background: #FFF;
+        }
+        
+        .option.selected {
+            background: linear-gradient(135deg, #FFF5F0 0%, #FFE8DC 100%);
+            border-color: var(--primary);
+            box-shadow: 0 4px 16px rgba(255, 107, 53, 0.2);
+        }
+        
+        .option.selected::before {
+            width: 100%;
+        }
+        
+        .option-label {
+            font-weight: 600;
+            color: var(--primary);
+            margin-right: 8px;
+            min-width: 24px;
+        }
+        
+        .checkmark {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+        
+        .option.selected .checkmark {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .checkmark::after {
+            content: '✓';
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.3s ease;
+        }
+        
+        .option.selected .checkmark::after {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .multi-select-note {
+            text-align: center;
+            color: var(--text-light);
+            font-size: 13px;
+            margin-bottom: 16px;
+            font-style: italic;
+        }
+        
+        .other-input {
+            margin-top: 8px;
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: 'DM Sans', sans-serif;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .other-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.1);
+        }
+        
+        .navigation {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 16px rgba(255, 107, 53, 0.3);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #F5F5F5;
+            color: var(--text-dark);
+            border: 2px solid var(--border);
+        }
+        
+        .btn-secondary:active {
+            background: #EBEBEB;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .summary {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 30px 20px;
+            box-shadow: 0 8px 30px var(--shadow);
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .summary-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--secondary);
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        
+        .summary-item {
+            background: #FAFAFA;
+            border-left: 4px solid var(--primary);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .summary-question {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-medium);
+            margin-bottom: 8px;
+        }
+        
+        .summary-answer {
+            font-size: 15px;
+            color: var(--text-dark);
+            line-height: 1.5;
+        }
+        
+        .summary-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        
+        .success-icon {
+            text-align: center;
+            font-size: 64px;
+            margin-bottom: 16px;
+            animation: bounce 0.6s ease;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 12px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .question-text {
+                font-size: 18px;
+            }
+            
+            .option {
+                padding: 16px 18px;
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Encuesta de Satisfacción</h1>
+            <p>Tu opinión nos ayuda a mejorar</p>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+            <div class="progress-text" id="progressText">Pregunta 1 de 6</div>
+        </div>
+        
+        <div class="question-card" id="questionCard">
+            <div class="question-number" id="questionNumber">PREGUNTA 1</div>
+            <div class="question-text" id="questionText"></div>
+            <div class="multi-select-note hidden" id="multiSelectNote">
+                💡 Puedes seleccionar más de una opción
+            </div>
+            <div class="options" id="optionsContainer"></div>
+            
+            <div class="navigation">
+                <button class="btn btn-secondary hidden" id="prevBtn" onclick="previousQuestion()">
+                    ← Anterior
+                </button>
+                <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">
+                    Siguiente →
+                </button>
+            </div>
+        </div>
+        
+        <div class="summary hidden" id="summaryCard">
+            <div class="success-icon">🎉</div>
+            <div class="summary-title">¡Gracias por tu tiempo!</div>
+            <div id="summaryContent"></div>
+            <div class="summary-actions">
+                <button class="btn btn-primary" onclick="shareWhatsApp()">
+                    Enviar por WhatsApp 📱
+                </button>
+                <button class="btn btn-secondary" onclick="copyResults()">
+                    Copiar Resultados 📋
+                </button>
+                <button class="btn btn-secondary" onclick="restartSurvey()">
+                    Reiniciar Encuesta 🔄
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                id: 'P1',
+                text: 'En una escala del 1 al 5 (donde 5 es "Excelente"), ¿cómo calificarías tu experiencia general con el último crédito que tuviste con nosotros?',
+                options: [
+                    { value: 'A', label: '5 - Excelente' },
+                    { value: 'B', label: '4 - Buena' },
+                    { value: 'C', label: '3 - Regular' },
+                    { value: 'D', label: '2 - Mala' },
+                    { value: 'E', label: '1 - Muy Mala' }
+                ],
+                multiSelect: false
+            },
+            {
+                id: 'P2',
+                text: '¿Cuál es la razón principal por la que no has solicitado un nuevo crédito con nosotros?',
+                options: [
+                    { value: 'A', label: 'Actualmente no he necesitado financiamiento.' },
+                    { value: 'B', label: 'Encontré mejores condiciones (ej. tasa de interés, monto) en otra institución.' },
+                    { value: 'C', label: 'El proceso de solicitud o renovación me pareció complicado o tardado.' },
+                    { value: 'D', label: 'Las condiciones o costos (tasa, comisiones) que me ofrecían no me parecieron atractivos.' },
+                    { value: 'E', label: 'Tuve una experiencia negativa con el servicio (atención al cliente, cobranza, etc.)' },
+                    { value: 'Otro', label: 'Otro', hasInput: true }
+                ],
+                multiSelect: false
+            },
+            {
+                id: 'P3',
+                text: 'Si recientemente buscaste o solicitaste un crédito, ¿qué fue lo que más te atrajo de la oferta de otra institución?',
+                options: [
+                    { value: 'A', label: 'Tasa de interés visiblemente más baja.' },
+                    { value: 'B', label: 'Proceso de solicitud mucho más rápido y sencillo (ej. en línea o por app).' },
+                    { value: 'C', label: 'Me ofrecieron un monto de crédito más alto del que esperaba.' },
+                    { value: 'D', label: 'Menos requisitos, menos "papeles" o sin aval.' },
+                    { value: 'E', label: 'Mejor atención y seguimiento durante el proceso.' },
+                    { value: 'F', label: 'No he buscado crédito en otra institución.' },
+                    { value: 'Otro', label: 'Otro', hasInput: true }
+                ],
+                multiSelect: true
+            },
+            {
+                id: 'P4',
+                text: 'Pensando en tu experiencia pasada con nosotros, ¿en cuál o cuáles de las siguientes áreas crees que podríamos mejorar?',
+                options: [
+                    { value: 'A', label: 'La claridad de la información (contrato, comisiones, tabla de pagos).' },
+                    { value: 'B', label: 'La rapidez para autorizar y entregar el dinero.' },
+                    { value: 'C', label: 'La atención y amabilidad del personal (en sucursal o por teléfono).' },
+                    { value: 'D', label: 'La facilidad y las opciones para realizar los pagos.' },
+                    { value: 'E', label: 'El proceso de recordatorio de pago o cobranza.' },
+                    { value: 'Otro', label: 'Otro', hasInput: true }
+                ],
+                multiSelect: true
+            },
+            {
+                id: 'P5',
+                text: '¿Qué te motivaría MÁS a considerar a [Nombre de la Financiera] para tu próximo crédito?',
+                options: [
+                    { value: 'A', label: 'Una tasa de interés preferencial por ser cliente recurrente.' },
+                    { value: 'B', label: 'Un proceso de renovación pre-aprobado, mucho más rápido y con menos papeleo.' },
+                    { value: 'C', label: 'Mayor flexibilidad en los plazos o un monto de crédito más alto.' },
+                    { value: 'D', label: 'Mejoras claras en la atención al cliente y servicio digital (App/Web).' },
+                    { value: 'E', label: 'Un programa de lealtad (recompensas, descuentos, etc.).' },
+                    { value: 'F', label: 'Nada, no estoy interesado en futuros créditos por el momento.' },
+                    { value: 'Otro', label: 'Otro', hasInput: true }
+                ],
+                multiSelect: false
+            },
+            {
+                id: 'P6',
+                text: 'Basado en tu última experiencia completa, ¿qué tan probable es que recomiendes a [Nombre de la Financiera] a un amigo o familiar?',
+                options: [
+                    { value: 'A', label: 'Muy probable, tuve una gran experiencia.' },
+                    { value: 'B', label: 'Probable, fue una buena experiencia en general.' },
+                    { value: 'C', label: 'Neutral, fue una experiencia sin problemas, pero tampoco destacable.' },
+                    { value: 'D', label: 'Poco probable, tuve algunos inconvenientes.' },
+                    { value: 'E', label: 'Nada probable, no lo recomendaría.' },
+                    { value: 'Otro', label: 'Otro', hasInput: true }
+                ],
+                multiSelect: false
+            }
+        ];
+
+        let currentQuestion = 0;
+        let answers = {};
+
+        function init() {
+            loadAnswers();
+            renderQuestion();
+        }
+
+        function loadAnswers() {
+            const stored = localStorage.getItem('surveyAnswers');
+            if (stored) {
+                answers = JSON.parse(stored);
+            }
+        }
+
+        function saveAnswers() {
+            localStorage.setItem('surveyAnswers', JSON.stringify(answers));
+        }
+
+        function renderQuestion() {
+            const question = questions[currentQuestion];
+            
+            document.getElementById('questionNumber').textContent = `PREGUNTA ${currentQuestion + 1}`;
+            document.getElementById('questionText').textContent = question.text;
+            document.getElementById('progressText').textContent = `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+            document.getElementById('progressBar').style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            
+            const multiNote = document.getElementById('multiSelectNote');
+            if (question.multiSelect) {
+                multiNote.classList.remove('hidden');
+            } else {
+                multiNote.classList.add('hidden');
+            }
+            
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                
+                const isSelected = answers[question.id] && 
+                    (Array.isArray(answers[question.id]) 
+                        ? answers[question.id].includes(option.value)
+                        : answers[question.id] === option.value);
+                
+                if (isSelected) {
+                    optionDiv.classList.add('selected');
+                }
+                
+                optionDiv.innerHTML = `
+                    <span class="checkmark"></span>
+                    <div class="option-content">
+                        <span class="option-label">${option.value})</span>
+                        ${option.label}
+                    </div>
+                `;
+                
+                optionDiv.onclick = () => selectOption(option.value, question.multiSelect);
+                
+                if (option.hasInput && isSelected) {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.className = 'other-input';
+                    input.placeholder = 'Especifica...';
+                    input.value = answers[`${question.id}_other`] || '';
+                    input.onclick = (e) => e.stopPropagation();
+                    input.oninput = (e) => {
+                        answers[`${question.id}_other`] = e.target.value;
+                        saveAnswers();
+                    };
+                    optionDiv.querySelector('.option-content').appendChild(input);
+                }
+                
+                container.appendChild(optionDiv);
+            });
+            
+            document.getElementById('prevBtn').classList.toggle('hidden', currentQuestion === 0);
+            updateNextButton();
+        }
+
+        function selectOption(value, multiSelect) {
+            const question = questions[currentQuestion];
+            
+            if (multiSelect) {
+                if (!answers[question.id]) {
+                    answers[question.id] = [];
+                }
+                const index = answers[question.id].indexOf(value);
+                if (index > -1) {
+                    answers[question.id].splice(index, 1);
+                    if (value === 'Otro') {
+                        delete answers[`${question.id}_other`];
+                    }
+                } else {
+                    answers[question.id].push(value);
+                }
+            } else {
+                if (answers[question.id] === value) {
+                    delete answers[question.id];
+                    delete answers[`${question.id}_other`];
+                } else {
+                    answers[question.id] = value;
+                }
+            }
+            
+            saveAnswers();
+            renderQuestion();
+        }
+
+        function updateNextButton() {
+            const question = questions[currentQuestion];
+            const hasAnswer = answers[question.id] && 
+                (Array.isArray(answers[question.id]) 
+                    ? answers[question.id].length > 0
+                    : true);
+            
+            const nextBtn = document.getElementById('nextBtn');
+            nextBtn.disabled = !hasAnswer;
+            
+            if (currentQuestion === questions.length - 1) {
+                nextBtn.textContent = 'Finalizar ✓';
+            } else {
+                nextBtn.textContent = 'Siguiente →';
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                renderQuestion();
+            } else {
+                showSummary();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                renderQuestion();
+            }
+        }
+
+        function showSummary() {
+            document.getElementById('questionCard').classList.add('hidden');
+            document.getElementById('summaryCard').classList.remove('hidden');
+            
+            const summaryContent = document.getElementById('summaryContent');
+            let html = '';
+            
+            questions.forEach(question => {
+                const answer = answers[question.id];
+                if (answer) {
+                    html += `
+                        <div class="summary-item">
+                            <div class="summary-question">${question.text}</div>
+                            <div class="summary-answer">${formatAnswer(question, answer)}</div>
+                        </div>
+                    `;
+                }
+            });
+            
+            summaryContent.innerHTML = html;
+        }
+
+        function formatAnswer(question, answer) {
+            if (Array.isArray(answer)) {
+                return answer.map(val => {
+                    const option = question.options.find(opt => opt.value === val);
+                    let text = option ? `${val}) ${option.label}` : val;
+                    if (val === 'Otro' && answers[`${question.id}_other`]) {
+                        text += ` - ${answers[`${question.id}_other`]}`;
+                    }
+                    return text;
+                }).join('<br>');
+            } else {
+                const option = question.options.find(opt => opt.value === answer);
+                let text = option ? `${answer}) ${option.label}` : answer;
+                if (answer === 'Otro' && answers[`${question.id}_other`]) {
+                    text += ` - ${answers[`${question.id}_other`]}`;
+                }
+                return text;
+            }
+        }
+
+        function getResultsText() {
+            let text = '📊 *RESULTADOS DE ENCUESTA*\n\n';
+            
+            questions.forEach((question, index) => {
+                const answer = answers[question.id];
+                if (answer) {
+                    text += `*Pregunta ${index + 1}:*\n${question.text}\n\n`;
+                    text += `*Respuesta:*\n${formatAnswer(question, answer).replace(/<br>/g, '\n')}\n\n`;
+                    text += '-------------------\n\n';
+                }
+            });
+            
+            return text;
+        }
+
+        function shareWhatsApp() {
+            const text = getResultsText();
+            const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
+        }
+
+        function copyResults() {
+            const text = getResultsText();
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✅ Resultados copiados al portapapeles');
+            });
+        }
+
+        function restartSurvey() {
+            if (confirm('¿Estás seguro de que quieres reiniciar la encuesta?')) {
+                localStorage.removeItem('surveyAnswers');
+                answers = {};
+                currentQuestion = 0;
+                document.getElementById('questionCard').classList.remove('hidden');
+                document.getElementById('summaryCard').classList.add('hidden');
+                renderQuestion();
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
